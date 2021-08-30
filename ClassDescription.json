@@ -1,0 +1,12 @@
+[
+	{
+		"language": "java",
+		"className": "Customer",
+		"classFilePath": ".",
+		"fields": [
+			{
+				"customerName": "string"
+			}
+		]
+	}
+]

@@ -1,11 +1,9 @@
 import { IGenerator } from "../Interfaces/IGenerator";
 import { ConfigRetriever } from "../Utils/ConfigRetriever";
-import { Logger } from "../Utils/Logger";
 import path from "path";
 
 export class GeneratorFactory {
 	public static getInstance(className: string): IGenerator {
-
 		// Get the class path of the given className
 		const classPath = ConfigRetriever.getClassPath("generators", className);
 

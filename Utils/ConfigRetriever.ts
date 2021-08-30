@@ -1,7 +1,7 @@
 import { ActionFailure } from "./ActionResult";
 
 export class ConfigRetriever {
-	public static _rootConfig = new Map<string, any>(Object.entries(require("../RootConfig.json")));
+	protected static _rootConfig = new Map<string, any>(Object.entries(require("../RootConfig.json")));
 
 	public static getClassPath(componentKey: string, className: string): string {
 		// Get the map for the given component key
