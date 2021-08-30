@@ -1,0 +1,8 @@
+{
+	"generators": {
+		"java": "./Generators/JavaDataClassGenerator.ts"
+	},
+	"readers": {
+		"json": ""
+	}
+}
