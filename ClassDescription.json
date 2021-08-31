@@ -2,11 +2,19 @@
 	{
 		"language": "java",
 		"className": "Customer",
-		"classFilePath": ".",
-		"fields": [
-			{
-				"customerName": "string"
-			}
-		]
+		"classFilePath": "../java-router/src/main/java/com/example/javarouter",
+		"fields": {
+			"customerName": "String",
+			"contactLastName": "String",
+			"contactFirstName": "String",
+			"phone": "String",
+			"addressLine1": "String",
+			"addressLine2": "String",
+			"city": "String",
+			"state": "String",
+			"postalCode": "String",
+			"country": "String",
+			"creditLimit": "double"
+		}
 	}
 ]

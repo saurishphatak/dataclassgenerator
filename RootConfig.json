@@ -1,8 +1,16 @@
 {
 	"generators": {
-		"java": "./Generators/JavaDataClassGenerator.ts"
+		"java": "./typescript/Generators/JavaDataClassGenerator.ts"
 	},
 	"readers": {
-		"json": ""
+		"json": "./typescript/Readers/JSONReader.ts"
+	},
+	"caseconverters": {
+		"defaultcaseconverter": "./typescript/Utils/DefaultCaseConverter.ts"
+	},
+	"fileextensions": {
+		"java": "java",
+		"typescript": "ts",
+		"javascript": "js"
 	}
 }
