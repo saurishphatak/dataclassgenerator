@@ -24,8 +24,11 @@ export default class JavaDataClassGenerator implements IGenerator {
 
 	@Logger.call()
 	public generate(): string {
+		// Holds the auto generated comment
+		let classCode = `/**${this.N1}* Auto Generated Data Class${this.N1}*${this.N1}* Generated on : ${new Date().toString()}${this.N1}*/${this.N1}`;
+
 		// Holds the code for the data class
-		let classCode = `public class ${this._metadata.className} {${this.N1}`;
+		classCode += `public class ${this._metadata.className} {${this.N1}`;
 
 		// Go over each field and add it to the code
 		for (const field of this._metadata.fields) {
@@ -60,6 +63,5 @@ export default class JavaDataClassGenerator implements IGenerator {
 
 		// Complete the braces and return
 		return classCode + `${this.N1}}`;
-
 	}
 }
