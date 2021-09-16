@@ -1,6 +1,7 @@
 {
 	"generators": {
-		"java": "./typescript/Generators/JavaDataClassGenerator.ts"
+		"java": "./typescript/Generators/JavaDataClassGenerator.ts",
+		"typescript": "./typescript/Generators/TypescriptDataClassGenerator.ts"
 	},
 	"readers": {
 		"json": "./typescript/Readers/JSONReader.ts"

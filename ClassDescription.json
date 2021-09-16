@@ -1,20 +1,20 @@
 [
 	{
-		"language": "java",
+		"language": "typescript",
 		"className": "Customer",
-		"classFilePath": "../java-router/src/main/java/com/example/javarouter",
+		"classFilePath": "./Test",
 		"fields": {
-			"customerName": "String",
-			"contactLastName": "String",
-			"contactFirstName": "String",
-			"phone": "String",
-			"addressLine1": "String",
-			"addressLine2": "String",
-			"city": "String",
-			"state": "String",
-			"postalCode": "String",
-			"country": "String",
-			"creditLimit": "double"
+			"customerName": "string",
+			"contactLastName": "string",
+			"contactFirstName": "string",
+			"phone": "string",
+			"addressLine1": "string",
+			"addressLine2": "string",
+			"city": "string",
+			"state": "string",
+			"postalCode": "string",
+			"country": "string",
+			"creditLimit": "number"
 		}
 	}
 ]
