@@ -1,9 +1,6 @@
-import { ActionResult } from "../Utils/ActionResult";
-import { ICaseConvertor } from "./ICaseConvertor";
 import { IClassDescription } from "./IClassDescription";
+import { IGeneratorV1 } from "./IGeneratorV1";
 
-export interface IGenerator {
-	set classDescription(metadata: IClassDescription);
-	set caseConverter(caseConverter: ICaseConvertor);
-	generate(): string;
+export interface IGenerator extends IGeneratorV1 {
+    set classDescription(metadata: IClassDescription);
 }
