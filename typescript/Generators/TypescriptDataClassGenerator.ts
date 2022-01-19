@@ -24,6 +24,12 @@ export default class TypescriptDataClassGenerator extends TypescriptDataClassGen
             ]
         );
 
+    // Holds code for all the fields
+    protected _fieldList: string[] = [];
+
+    // Holds getter setter code for the fields
+    protected _getterSetterCode: string[] = [];
+
     // Generates the data class
     @Logger.call()
     public generate(): any {
@@ -49,33 +55,13 @@ export default class TypescriptDataClassGenerator extends TypescriptDataClassGen
         } else
             Logger.warn(`Decorators not found for class : ${className}`);
 
-        // Holds the base classes for this class (if any)
-        let baseClasses: string[] = this._classSpecification.extends ?? [];
-        let extendsClasses = "";
-
-        // Add the base classes to the class
-        if (baseClasses.length) {
-            Logger.info("Base classes found for class", [className]);
-
-            extendsClasses = baseClasses.reduce(
-                (previousValue, baseClass, currentIndex) => previousValue + `${baseClass}${currentIndex != baseClasses.length - 1 ? ", " : " "}`
-                , "");
-        }
-        else
-            Logger.warn(`Base classes not found for class : ${className}`);
 
         // Start adding the code for the class
-        classCode += `export abstract class ${className}Abstract ${extendsClasses.length ? "extends " + extendsClasses : ""}{${this.N1}`;
-
-        // Holds code for all the fields
-        const fieldList: string[] = [];
-
-        // Holds getter setter code for the fields
-        const getterSetterCode: string[] = [];
+        classCode += `export abstract class ${className}Abstract {${this.N1}`;
 
         // Holds the fields of the class
         const fields = this._classSpecification.fields;
-        fields ? Logger.info("Fields found for class", [className]) : Logger.warn(`Fields not found for class : ${className}`);
+        fields ? Logger.info("Fields found for class", [`[${className}]`]) : Logger.error(`Fields not found for class`, [`[${className}]`]);
 
         // Holds the constructors types that have to be generated for this class
         const constructorTypes = this._classSpecification.constructors;
@@ -89,8 +75,8 @@ export default class TypescriptDataClassGenerator extends TypescriptDataClassGen
             if (constructorTypes?.size == 1) {
                 Logger.info(`Generating constructor type ${constructorType} for class`, [className]);
             } else {
-                Logger.warn(`Multiple constructors found for class : ${className}`);
-                Logger.warn(`Generating the first constructor type : ${constructorTypes?.keys()?.next().value}`);
+                Logger.warn(`Multiple constructors found for class [${className}]`);
+                Logger.warn(`Generating the first constructor type for class [${className}] : [${constructorTypes?.keys()?.next().value}]`);
             }
 
             // If the constructor type is valid, generate code
@@ -104,23 +90,29 @@ export default class TypescriptDataClassGenerator extends TypescriptDataClassGen
 
                 // Add the constructor code to the class code
                 classCode += constructorCode;
+
+                // If the constructor type was default, generate the fields
+                if (constructorType == "default") {
+                    this.generateFields();
+                }
+
             } else {
                 // Warn the user about unrecognized constructor type
-                Logger.error(`Constructor type not recognized`, [constructorType]);
+                Logger.error(`Constructor type not recognized`, [`[${constructorType}]`]);
             }
         }
         else
-            Logger.warn(`No constructors to be generated for class : ${className}`);
+            Logger.warn(`No constructors to be generated for class [${className}]`);
 
-        // Add fields to the class
+        // Add getters and setters to the class
         for (const fieldNameKey of fields?.keys()) {
             // Generate the getter and setter for this field
-            getterSetterCode.push(this.generateGetter(fieldNameKey));
-            getterSetterCode.push(this.generateSetter(fieldNameKey));
+            this._getterSetterCode.push(this.generateGetter(fieldNameKey));
+            this._getterSetterCode.push(this.generateSetter(fieldNameKey));
         }
 
-        fieldList.forEach(fieldCode => classCode += (fieldCode + `${this.N1}`));
-        getterSetterCode.forEach(getterSetter => classCode += (getterSetter + `${this.N1}`));
+        this._fieldList.forEach(fieldCode => classCode += (fieldCode + `${this._fieldList.length > 1 ? this.N1 : ""}`));
+        this._getterSetterCode.forEach(getterSetter => classCode += (getterSetter + `${this._getterSetterCode.length > 1 ? this.N1 : ""}`));
 
         return classCode + `${this.N1}}`;
     }
@@ -136,16 +128,17 @@ export default class TypescriptDataClassGenerator extends TypescriptDataClassGen
     // Generates positional (parameterized) constructor
     @Logger.call()
     public generateParameterizedConstructor(): string {
-        myLogger("HERE");
         // Holds the fields of this class
         const fields = this._classSpecification.fields;
+
+        if (!fields) Logger.error(`No fields found for class`, [`[${this._classSpecification.className}]`]);
 
         // Holds the constructor code
         let constructorCode = `${this.N1 + this.T1}public constructor (${this.N1}`;
         let fieldCount = 0;
 
         // Go over each field
-        for (const fieldName of fields.keys()) {
+        for (const fieldName of fields?.keys()) {
             fieldCount++;
 
             // Holds the fieldProperties for this field
@@ -155,10 +148,14 @@ export default class TypescriptDataClassGenerator extends TypescriptDataClassGen
             const modifier: string = fieldProperties.get("modifier") ?? "public";
 
             // Holds the data type of this field
-            const dataType: string = fieldProperties.get("type") ?? "";
+            const dataType: string = fieldProperties.get("type");
+            if (!dataType?.length) Logger.warn(`No data type found for field [${fieldName}] of class [${this._classSpecification.className}]. Using default type [any]`);
 
             // Holds the default value of this field
             const defaultValue: string = fieldProperties.get("defaultValue");
+
+            if (defaultValue?.length) Logger.info(`Default value found for field [${fieldName}] of class [${this._classSpecification.className}]`, []);
+            else Logger.warn(`No default value found for field [${fieldName}] of class [${this._classSpecification.className}]`);
 
             // Holds the comment for this field
             const comment: string = fieldProperties.get("comment") ?? "";
@@ -166,10 +163,13 @@ export default class TypescriptDataClassGenerator extends TypescriptDataClassGen
             // Holds the decorators of this field
             const decorators: string[] = fieldProperties.get("decorators") ?? [];
 
-            if (fieldCount == 1)
-                constructorCode += `${this.T2 + comment + this.N1}`;
+            if (decorators?.length) Logger.info(`Decorator(s) found for field [${fieldName}] of class [${this._classSpecification.className}]`, []);
+            else Logger.warn(`No decorators found for field [${fieldName}] of class [${this._classSpecification.className}]`);
 
-            constructorCode += `${this.T2}${modifier} ${modifier == "public" ? "" : "_"}${fieldName}: ${dataType}${defaultValue ? " = " + defaultValue : ""}`;
+            // Add the decorators to the field
+            let decoratorCode = decorators.reduce((previousValue, decorator) => previousValue + `${this.T2}${decorator}${this.N1}`, "");
+
+            constructorCode += `${comment.length ? this.T2 + comment + this.N1 : ""}${decoratorCode}${this.T2}${modifier} ${modifier == "public" ? "" : "_"}${fieldName}: ${dataType ? dataType : "any"}${defaultValue ? " = " + defaultValue : ""}`;
 
             if (fieldCount != fields.size)
                 constructorCode += `,${this.N1}`;
@@ -190,6 +190,7 @@ export default class TypescriptDataClassGenerator extends TypescriptDataClassGen
 
         // Get the properties for this field
         let fieldProperties: Map<string, any> = this._classSpecification.fields.get(fieldName);
+
         // Get the type of the field
         let dataType: string = fieldProperties.get("type") ?? "any";
 
@@ -198,14 +199,20 @@ export default class TypescriptDataClassGenerator extends TypescriptDataClassGen
         myLogger(`Getter for ${fieldName}`, getterPropertyMap);
 
         // Return if there is no map found
-        if (!getterPropertyMap)
+        if (!getterPropertyMap) {
+            Logger.warn(`No getter to be generated for field [${fieldName}] of class [${this._classSpecification.className}]`);
             return getterCode;
+        }
 
         // If there is a getter property map, get the decorators
         let decorators: string[] = getterPropertyMap?.get("decorators");
+        if (decorators?.length) {
+            Logger.info(`Accessor decorator(s) found of field [${fieldName}] of [${this._classSpecification.className}]`, [])
 
-        // Add the decorators to the getterCode
-        getterCode = decorators.reduce((previousValue, decorator) => previousValue + `${this.T1}${decorator}${this.N1}`, "");
+            // Add the decorators to the getterCode
+            getterCode = decorators.reduce((previousValue, decorator) => previousValue + `${this.T1}${decorator}${this.N1}`, "");
+        } else
+            Logger.warn(`No accessor decorator(s) found for field [${fieldName}] of [${this._classSpecification.className}]`);
 
         getterCode += `${this.T1}public abstract get ${fieldName}(): ${dataType};${this.N1}`;
 
@@ -227,17 +234,34 @@ export default class TypescriptDataClassGenerator extends TypescriptDataClassGen
         myLogger(`Setter for ${fieldName}`, setterPropertyMap);
 
         // If there is no setter map, return
-        if (!setterPropertyMap)
+        if (!setterPropertyMap) {
+            Logger.warn(`No setter to be generated for field [${fieldName}] of class [${this._classSpecification.className}]`);
             return setterCode;
+        }
 
         // Get the decorators for this setter
         let decorators: string[] = setterPropertyMap?.get("decorators") ?? [];
 
-        setterCode = decorators.reduce((previousValue, decorator) => previousValue + `${this.T1}${decorator}${this.N1}`, "");
+        if (decorators?.length) {
+            Logger.info(`Mutator decorator(s) found for field [${fieldName}] of class [${this._classSpecification.className}]`, []);
+            setterCode = decorators.reduce((previousValue, decorator) => previousValue + `${this.T1}${decorator}${this.N1}`, "");
+        } else
+            Logger.warn(`No mutator decorator(s) found for field [${fieldName}] of class [${this._classSpecification.className}]`);
 
         setterCode += `${this.T1}public abstract set ${fieldName}(newValue): ${dataType};${this.N1}`;
 
         return setterCode;
+    }
+
+    // Generates code for all fields
+    public generateFields() {
+        let fields = this._classSpecification.fields;
+
+        if (!fields) Logger.error(`No fields found for class [${this._classSpecification.className}]`, []);
+
+        for (const fieldName of fields?.keys()) {
+            this._fieldList.push(this.generateFieldCode(fieldName));
+        }
     }
 
     // Generates field code 
@@ -273,7 +297,4 @@ export default class TypescriptDataClassGenerator extends TypescriptDataClassGen
         return fieldCode;
     }
 }
-
-let mine = new Map<string, any>([["mine", 1], ["yours", 2]]);
-
-console.log(mine.has("his"));
+myLogger = () => { };
