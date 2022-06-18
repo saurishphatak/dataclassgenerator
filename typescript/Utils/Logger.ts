@@ -96,6 +96,8 @@ export class Logger {
         if (Logger.enableAll && Logger.showError) {
             Logger.message(`${chalk.redBright.bold('[ERROR]')} ${Logger.time()} ${chalk.redBright(message)} : ${[...parameters]} `);
 
+            // Throw a new error
+            throw new Error("");
         }
 
         else
@@ -128,3 +130,4 @@ export class Logger {
     }
 
 }
+

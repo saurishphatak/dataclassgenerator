@@ -15,7 +15,6 @@ export default class JSONReader extends JSONReaderV1 {
                 // Convert each classDescription to appropriate structure
                 var result: IClassDescription[] = classDescriptions.map(classDescription => (this.convertObjectToMap(classDescription)) as IClassDescription);
 
-                // console.log(result);
                 resolve(new ActionSuccess(result));
             } catch (exception: any) {
                 reject(new ActionFailure(undefined, exception.message));
@@ -24,6 +23,7 @@ export default class JSONReader extends JSONReaderV1 {
     }
 
     // Converts an Object to Map<string, any>
+    @Logger.call()
     protected convertObjectToMap(outerObject: object): {} {
 
         const newObject: any = {};
@@ -82,13 +82,13 @@ export default class JSONReader extends JSONReaderV1 {
 //     }
 // ];
 
-const reader = new JSONReader();
-reader.filePath = "./ClassDescription.json";
-reader.read().then(result => {
-    const res = result.result as IClassDescription[];
+// const reader = new JSONReader();
+// reader.filePath = "./ClassDescription.json";
+// reader.read().then(result => {
+//     const res = result.result as IClassDescription[];
 
-    res.forEach(resu => console.log(resu.fields));
-});
+//     res.forEach(resu => console.log(resu.fields));
+// });
 
 
 
