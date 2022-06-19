@@ -21,7 +21,7 @@ export class GeneratorFactoryV3 extends GeneratorFactoryV2 {
         // Get the class path 
         const classPath = ConfigRetriever.retrieve("generators", className);
 
-        debug(`${GeneratorFactoryV3.className}::${functionName}`, { classPath });
+        Logger.debug(`${GeneratorFactoryV3.className}::${functionName}`, { classPath });
 
         // Create a new instance of the className and return
         return new (require(path.resolve(classPath)).default)() as IGeneratorV3;

@@ -5,7 +5,8 @@ import { CsharpAPIMainV1 } from "../typescript/CsharpAPIMainV1";
 import { Logger } from "../typescript/Utils/Logger";
 import { environment } from "../typescript/environment";
 
-let debug = !environment.production ? console.log : () => { };
+// let debug = !environment.production ? console.log : () => { };
+environment.production ? Logger.toggleDebug() : () => { };
 
 @Logger.log
 export class App {
@@ -15,14 +16,13 @@ export class App {
     public port = process.env.PORT ?? 3000;
 
     public constructor() {
-        debug(`${this.className}::constructor()`);
     }
 
     // Dummy get endpoint
     async dummyGet(request: Request, response: Response, next: NextFunction) {
         let functionName = "dummyGet()";
 
-        debug(`${this.className}::${functionName}`);
+        Logger.debug(`${this.className}::${functionName}`);
 
         response.status(200).json({ name: "Dummy Node" });
     }
@@ -34,7 +34,7 @@ export class App {
 
         let dataClassDescription = request.body;
 
-        debug(`${this.className}::${functionName}`, { dataClassDescription });
+        Logger.debug(`${this.className}::${functionName}`, { dataClassDescription });
 
         try {
             let main = new CsharpAPIMainV1();
@@ -43,7 +43,7 @@ export class App {
 
             let result = (await main.generate()).result;
 
-            debug(`${this.className}::${functionName}`, { result });
+            Logger.debug(`${this.className}::${functionName}`, { result });
 
             response.json(result);
         }
@@ -55,6 +55,7 @@ export class App {
     }
 
     // Sets up app middleware
+    @Logger.call()
     setupAppMiddleware() {
         this.app.use(cors());
         this.app.use(bodyParser.json());
@@ -62,19 +63,21 @@ export class App {
     }
 
     // Sets up router middleware
+    @Logger.call()
     setupRouterMiddleware() {
         // this.app.get("/", this.dummyGet.bind(this));
         this.app.post("/csharp", this.generateCsharpClass.bind(this));
     }
 
     // Starts the web server
+    @Logger.call()
     public run() {
         this.setupAppMiddleware();
 
         this.setupRouterMiddleware();
 
         this.app.listen(this.port, () => {
-            debug(`${this.className} running on PORT : ${this.port}`);
+            Logger.info(`${this.className} running on PORT `, [this.port]);
         });
 
         return this.app;

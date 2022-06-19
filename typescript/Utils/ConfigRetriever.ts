@@ -2,7 +2,7 @@ import { environment } from "../environment";
 import { ActionFailure } from "./ActionResult";
 import { Logger } from "./Logger";
 
-let debug = !environment.production ? console.log : () => { };
+environment.production ? Logger.toggleDebug() : () => { };
 @Logger.log
 export class ConfigRetriever {
     protected static className = "ConfigRetriever";
@@ -20,13 +20,13 @@ export class ConfigRetriever {
             // Get the language map
             const languageMap = new Map<string, string>(Object.entries(this._rootConfig.get(componentKey)));
 
-            debug(`${this.className}::${functionName}`, { languageMap });
+            Logger.debug(`${this.className}::${functionName}`, { languageMap });
 
             // Get the classPath for the given className
             if (languageMap?.has(className)) {
                 const classPath = languageMap.get(className) as string;
 
-                debug(`${this.className}::${functionName}`, { classPath });
+                Logger.debug(`${this.className}::${functionName}`, { classPath });
 
                 return classPath;
             }

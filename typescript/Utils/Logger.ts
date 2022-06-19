@@ -13,6 +13,8 @@ export class Logger {
     // Whether to show params
     private static showParams: boolean = true;
 
+    private static showDebug = true;
+
     // Whether to enable all 
     private static enableAll: boolean = true;
 
@@ -104,6 +106,16 @@ export class Logger {
             Logger.message(`${chalk.redBright('Error messages are not ON!')} ${chalk.redBright.bold('-> Call toggleError() method to enable them.')} `)
     }
 
+    // Prints debug messages 
+    public static debug(message: string, parameters: any = undefined) {
+        if (Logger.enableAll && Logger.showDebug) {
+            console.log(`${chalk.white.bold('[DEBUG]')} ${Logger.time()} ${chalk.white(message)}`, parameters);
+        }
+
+        else
+            Logger.message(`${chalk.white('Debug messages are not ON!')} ${chalk.white.body('-> Call toggleDebug() method to enable them.')}`);
+    }
+
     // Toggles showWarning
     public static toggleWarning() {
         Logger.showWarning = !Logger.showWarning;
@@ -127,6 +139,10 @@ export class Logger {
     // Toggles enableAll
     public static toggleAll() {
         Logger.enableAll = !Logger.enableAll;
+    }
+
+    public static toggleDebug() {
+        Logger.showDebug = !Logger.showDebug;
     }
 
 }

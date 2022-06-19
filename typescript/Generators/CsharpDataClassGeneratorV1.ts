@@ -8,6 +8,11 @@ let debug = !environment.production ? console.log : () => { };
 
 @Logger.log
 export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
+    protected T1 = "\t";
+    protected T2 = "\t\t";
+    protected T3 = "\t\t\t";
+    protected N1 = "\n";
+
     protected _classDescription!: ICharpClass;
     protected _caseConverter!: ICaseConvertor;
 
@@ -21,6 +26,14 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
 
     @Logger.call()
     generate(): string {
-        return "Csharp Class";
+        let namespace = this._classDescription.namespace;
+
+        let classCode = ``;
+
+        if (namespace.length > 0) {
+            classCode += `namespace ${namespace} {${this.N1}`;
+        }
+
+        return classCode;
     }
 }
