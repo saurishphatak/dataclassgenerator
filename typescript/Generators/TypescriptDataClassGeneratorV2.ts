@@ -7,7 +7,7 @@ import TypescriptDataClassGeneratorV1 from "./TypescriptDataClassGeneratorV1";
 
 var myLogger = console.log;
 @Logger.log
-export default class TypescriptDataClassGenerator extends TypescriptDataClassGeneratorV1 {
+export default class TypescriptDataClassGeneratorV2 extends TypescriptDataClassGeneratorV1 {
     protected _classSpecification!: IClassDescription;
 
     public set classDescription(newClassDescription: IClassDescription) {

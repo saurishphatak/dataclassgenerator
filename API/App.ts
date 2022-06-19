@@ -1,9 +1,13 @@
 import express, { Express, NextFunction, Request, Response, urlencoded } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
+import { CsharpAPIMainV1 } from "../typescript/CsharpAPIMainV1";
+import { Logger } from "../typescript/Utils/Logger";
+import { environment } from "../typescript/environment";
 
-let debug = console.log;
+let debug = !environment.production ? console.log : () => { };
 
+@Logger.log
 export class App {
     protected className = "App";
 
@@ -24,14 +28,30 @@ export class App {
     }
 
     // Gets the class description object
-    async generateClass(request: Request, response: Response, next: NextFunction) {
-        let functionName = "generateClass()";
+    @Logger.call()
+    async generateCsharpClass(request: Request, response: Response, next: NextFunction) {
+        let functionName = "generateCsharpClass()";
 
-        let field = request.body;
+        let dataClassDescription = request.body;
 
-        debug(`${this.className}::${functionName}`, field);
+        debug(`${this.className}::${functionName}`, { dataClassDescription });
 
-        response.status(200).send(field);
+        try {
+            let main = new CsharpAPIMainV1();
+
+            main.classDescriptions = [dataClassDescription];
+
+            let result = (await main.generate()).result;
+
+            debug(`${this.className}::${functionName}`, { result });
+
+            response.json(result);
+        }
+        catch (e: any) {
+            Logger.error(`${this.className}::${functionName}`, [{ message: e?.message }])
+
+            response.status(500).send(undefined);
+        }
     }
 
     // Sets up app middleware
@@ -44,7 +64,7 @@ export class App {
     // Sets up router middleware
     setupRouterMiddleware() {
         // this.app.get("/", this.dummyGet.bind(this));
-        this.app.post("/", this.generateClass.bind(this));
+        this.app.post("/csharp", this.generateCsharpClass.bind(this));
     }
 
     // Starts the web server

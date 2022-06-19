@@ -1,6 +1,6 @@
 import fs from "fs";
 import { CaseConverterFactory } from "./Factories/CaseConverterFactory";
-import { GeneratorFactory } from "./Factories/GeneratorFactory";
+import { GeneratorFactoryV2 } from "./Factories/GeneratorFactoryV2";
 import path from "path";
 import { ReaderFactory } from "./Factories/ReaderFactory";
 import { MainV1 } from "./MainV1";
@@ -9,7 +9,7 @@ import { Logger } from "./Utils/Logger";
 import { IClassDescription } from "./Interfaces/IClassDescription";
 
 @Logger.log
-export class Main extends MainV1 {
+export class MainV2 extends MainV1 {
     // Override the generate method
     @Logger.call()
     public async generate() {
@@ -28,7 +28,7 @@ export class Main extends MainV1 {
             try {
                 // Get the generator
                 const dataClassLanguage = classDescription.language;
-                const dataClassGenerator = GeneratorFactory.getInstance(dataClassLanguage);
+                const dataClassGenerator = GeneratorFactoryV2.getInstance(dataClassLanguage);
 
                 // Set the metadata
                 const caseConverter = CaseConverterFactory.getInstance();
@@ -60,7 +60,7 @@ export class Main extends MainV1 {
     }
 }
 
-const runner = new Main();
+const runner = new MainV2();
 runner.classDescriptionFilePath = "./ClassDescription.json";
 runner.classDescriptionFileType = "json";
 runner.generate();

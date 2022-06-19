@@ -1,24 +1,39 @@
+import { environment } from "../environment";
 import { ActionFailure } from "./ActionResult";
+import { Logger } from "./Logger";
 
+let debug = !environment.production ? console.log : () => { };
+@Logger.log
 export class ConfigRetriever {
-	protected static _rootConfig = new Map<string, any>(Object.entries(require("../../RootConfig.json")));
+    protected static className = "ConfigRetriever";
 
-	public static retrieve(componentKey: string, className: string): string {
-		// Get the map for the given component key
-		if (this._rootConfig.has(componentKey)) {
-			// Get the language map
-			const languageMap = new Map<string, string>(Object.entries(this._rootConfig.get(componentKey)));
+    protected static _rootConfig = new Map<string, any>(Object.entries(require("../../RootConfig.json")));
 
-			// Get the classPath for the given className
-			if (languageMap?.has(className)) {
-				const classPath = languageMap.get(className) as string;
+    @Logger.call()
+    public static retrieve(componentKey: string, className: string): string {
+        let functionName = "retrieve()";
 
-				return classPath;
-			}
+        // debug(`${this.className}::${functionName}`, { componentKey, className });
 
-			throw new ActionFailure(undefined, `No implementation of the given className : ${className} exists!`);
-		}
+        // Get the map for the given component key
+        if (this._rootConfig.has(componentKey)) {
+            // Get the language map
+            const languageMap = new Map<string, string>(Object.entries(this._rootConfig.get(componentKey)));
 
-		throw new ActionFailure(undefined, `Invalid component key : ${className}`);
-	}
+            debug(`${this.className}::${functionName}`, { languageMap });
+
+            // Get the classPath for the given className
+            if (languageMap?.has(className)) {
+                const classPath = languageMap.get(className) as string;
+
+                debug(`${this.className}::${functionName}`, { classPath });
+
+                return classPath;
+            }
+
+            throw new ActionFailure(undefined, `${ConfigRetriever.className}::${functionName} ==> No implementation of the given className : ${className} exists!`);
+        }
+
+        throw new ActionFailure(undefined, `${ConfigRetriever.className}::${functionName} ==> Invalid component key : ${className}`);
+    }
 }

@@ -1,17 +1,19 @@
 {
-	"generators": {
-		"java": "./typescript/Generators/JavaDataClassGenerator.ts",
-		"typescript": "./typescript/Generators/TypescriptDataClassGenerator.ts"
-	},
-	"readers": {
-		"json": "./typescript/Readers/JSONReader.ts"
-	},
-	"caseconverters": {
-		"defaultcaseconverter": "./typescript/Utils/DefaultCaseConverter.ts"
-	},
-	"fileextensions": {
-		"java": "java",
-		"typescript": "ts",
-		"javascript": "js"
-	}
+    "generators": {
+        "java": "./typescript/Generators/JavaDataClassGenerator.ts",
+        "typescript": "./typescript/Generators/TypescriptDataClassGeneratorV2.ts",
+        "csharp": "./typescript/Generators/CsharpDataClassGeneratorV1.ts"
+    },
+    "readers": {
+        "json": "./typescript/Readers/JSONReader.ts"
+    },
+    "caseconverters": {
+        "defaultcaseconverter": "./typescript/Utils/DefaultCaseConverter.ts"
+    },
+    "fileextensions": {
+        "java": "java",
+        "typescript": "ts",
+        "javascript": "js",
+        "csharp": "cs"
+    }
 }
