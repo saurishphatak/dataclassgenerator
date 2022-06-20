@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { environment } from "./environment";
 import { CaseConverterFactory } from "./Factories/CaseConverterFactory";
 import { GeneratorFactoryV3 } from "./Factories/GeneratorFactoryV3";
@@ -26,7 +28,10 @@ export class CsharpAPIMainV1 implements IAPIMainV1 {
         try {
 
             for (const classDescription of this._classDescriptions) {
-                debug(`${this.className}::${functionName}`, [classDescription]);
+                // debug(`${this.className}::${functionName}`, [classDescription]);
+                for (const field of classDescription.fields) {
+                    console.log(field);
+                }
 
                 let dataClassGenerator = GeneratorFactoryV3.getInstance(classDescription.language);
 
@@ -41,14 +46,21 @@ export class CsharpAPIMainV1 implements IAPIMainV1 {
 
                 let generatedClassCode = await dataClassGenerator.generate();
 
+                //! Temprorily generate a file
+                await fs.writeFile(
+                    path.resolve("./Test/") + `TestCSClass.cs`, generatedClassCode, () => { }
+                );
+
                 // Return the Action Success object
                 result = new ActionSuccess(generatedClassCode, "", 1);
             }
         } catch (e: any) {
-            Logger.error(`${this.className}::${functionName}`, [{ message: e.message }]);
+            // Logger.error(`${this.className}::${functionName}`, [{ message: e.message }]);
+            console.log(e);
 
             throw new ActionFailure(undefined, e.message, -1);
         }
         return result;
     }
 }
+

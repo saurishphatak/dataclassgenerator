@@ -2,7 +2,7 @@ export class CsharpProperty implements ICsharpProperty {
     public propertyName: string;
     public propertyType: string;
     public propertyAccessModifier = 'public';
-    public accessors: Map<string, any>;
+    public accessors: any;
     public propertyAttributes: string;
 
     public constructor(

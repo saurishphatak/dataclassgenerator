@@ -48,7 +48,8 @@ export class App {
             response.json(result);
         }
         catch (e: any) {
-            Logger.error(`${this.className}::${functionName}`, [{ message: e?.message }])
+            // Logger.error(`${this.className}::${functionName}`, [{ e }])
+            console.log(e);
 
             response.status(500).send(undefined);
         }
