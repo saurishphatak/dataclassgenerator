@@ -1,8 +1,8 @@
+namespace CustomerAPI.Models
+{
+[Required]
 public abstract class CustomerAbstract
 {
-	[Required]
-	public string customerName;
-
 	// Customer phone number
 	private string _phoneNumber;
 	private virtual string PhoneNumber
@@ -18,4 +18,18 @@ public abstract class CustomerAbstract
 		get;
 	}
 
-}	
+	public string customerName;
+
+	public Customer(
+		string phoneNumber,
+		string address,
+		string customerName
+	)
+	{
+		this.PhoneNumber = phoneNumber;
+		this._address = address;
+		this.customerName = customerName;
+
+}
+}
+}
