@@ -50,7 +50,7 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
 
         // Add class comment if any
         if (comment.trim().length > 0) {
-            classCode += `${comment}${this.N1}`;
+            classCode += `// ${comment.trim()}${this.N1}`;
         }
 
         // Add class attributes
@@ -285,8 +285,10 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
         let constructorCode = `${this.T1}public ${name}(${this.N1}`;
 
         // Add the fields to the list of parameters in the constructor
+        // only if they are to be initialized in the constructor
         for (const field of fields) {
-            constructorCode += `${this.T2}${field.dataType?.trim()} ${field.name?.trim()},${this.N1}`
+            if (field.isConstructorParam)
+                constructorCode += `${this.T2}${field.dataType?.trim()} ${field.name?.trim()},${this.N1}`
         }
 
         // Remove the last comma

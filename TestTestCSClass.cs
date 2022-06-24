@@ -1,10 +1,11 @@
 /**
  * Auto Generated Class
  *
- * Generated On : Thu Jun 23 2022 22:53:10 GMT+0530 (India Standard Time)
+ * Generated On : Fri Jun 24 2022 20:39:55 GMT+0530 (India Standard Time)
  *
  */
 
+// Represents a customer entity
 public abstract class CustomerAbstract
 {
 	[Required]
@@ -19,14 +20,13 @@ public abstract class CustomerAbstract
 	}
 
 	protected string _address;
-	public abstract string Address
+	protected abstract string Address
 	{
 		[Required]
 		get;
 	}
 
 	public Customer(
-		string customerName,
 		string phoneNumber,
 		string address
 	)
