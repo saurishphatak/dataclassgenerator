@@ -85,7 +85,3 @@ export class App {
     }
 }
 
-let app = new App();
-app.run();
-
-
