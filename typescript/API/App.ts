@@ -13,7 +13,7 @@ export class App {
     protected className = "App";
 
     public app = express();
-    public port = process.env.PORT ?? 3000;
+    public port = process.env.PORT || 3000;
 
     public constructor() {
     }
