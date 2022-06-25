@@ -60,7 +60,7 @@ export class MainV2 extends MainV1 {
     }
 }
 
-const runner = new MainV2();
-runner.classDescriptionFilePath = "./ClassDescription.json";
-runner.classDescriptionFileType = "json";
-runner.generate();
+// const runner = new MainV2();
+// runner.classDescriptionFilePath = "./ClassDescription.json";
+// runner.classDescriptionFileType = "json";
+// runner.generate();
