@@ -66,7 +66,7 @@ export class App {
     // Sets up router middleware
     @Logger.call()
     setupRouterMiddleware() {
-        // this.app.get("/", this.dummyGet.bind(this));
+        this.app.get("/", this.dummyGet.bind(this));
         this.app.post("/csharp", this.generateCsharpClass.bind(this));
     }
 
