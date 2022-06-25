@@ -28,7 +28,7 @@ export class CsharpAPIMainV1 implements IAPIMainV1 {
         try {
 
             for (const classDescription of this._classDescriptions) {
-                // debug(`${this.className}::${functionName}`, [classDescription]);
+                debug(`${this.className}::${functionName}`, [classDescription]);
                 for (const field of classDescription.fields) {
                     console.log(field);
                 }
@@ -46,13 +46,13 @@ export class CsharpAPIMainV1 implements IAPIMainV1 {
 
                 let generatedClassCode = await dataClassGenerator.generate();
 
-                //! Temprorily generate a file
-                await fs.writeFile(
-                    path.resolve("./Test/") + `TestCSClass.cs`, generatedClassCode, () => { }
-                );
+                let dataClassFileName = `${classDescription.name}.${fileExtension}`;
 
                 // Return the Action Success object
-                result = new ActionSuccess(generatedClassCode, "", 1);
+                result = new ActionSuccess({
+                    fileName: dataClassFileName,
+                    data: generatedClassCode
+                });
             }
         } catch (e: any) {
             // Logger.error(`${this.className}::${functionName}`, [{ message: e.message }]);

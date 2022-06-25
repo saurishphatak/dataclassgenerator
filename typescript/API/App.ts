@@ -1,9 +1,9 @@
 import express, { Express, NextFunction, Request, Response, urlencoded } from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import { CsharpAPIMainV1 } from "../typescript/CsharpAPIMainV1";
-import { Logger } from "../typescript/Utils/Logger";
-import { environment } from "../typescript/environment";
+import { CsharpAPIMainV1 } from "../CsharpAPIMainV1";
+import { Logger } from "../Utils/Logger";
+import { environment } from "../environment";
 
 // let debug = !environment.production ? console.log : () => { };
 environment.production ? Logger.toggleDebug() : () => { };
