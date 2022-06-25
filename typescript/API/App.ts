@@ -73,6 +73,8 @@ export class App {
     // Starts the web server
     @Logger.call()
     public run() {
+        Logger.debug(`${this.className}::run()`);
+
         this.setupAppMiddleware();
 
         this.setupRouterMiddleware();
