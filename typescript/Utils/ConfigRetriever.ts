@@ -2,7 +2,7 @@ import { environment } from "../environment";
 import { ActionFailure } from "./ActionResult";
 import { Logger } from "./Logger";
 
-environment.production ? Logger.toggleDebug() : () => { };
+// environment.production ? Logger.toggleDebug() : () => { };
 @Logger.log
 export class ConfigRetriever {
     protected static className = "ConfigRetriever";

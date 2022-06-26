@@ -6,11 +6,11 @@ import { ConfigRetriever } from "../Utils/ConfigRetriever";
 import { Logger } from "../Utils/Logger";
 import { GeneratorFactoryV2 } from "./GeneratorFactoryV2";
 
-let debug = !environment.production ? console.log : () => { };
+// let debug = !environment.production ? console.log : () => { };
 
 @Logger.log
 export class GeneratorFactoryV3 extends GeneratorFactoryV2 {
-    protected static className = "GeneratorFactoryV3";
+    protected static _className = "GeneratorFactoryV3";
 
     @Logger.call()
     public static getInstance(className: string): IGeneratorV3 {
@@ -21,7 +21,7 @@ export class GeneratorFactoryV3 extends GeneratorFactoryV2 {
         // Get the class path 
         const classPath = ConfigRetriever.retrieve("generators", className);
 
-        Logger.debug(`${GeneratorFactoryV3.className}::${functionName}`, { classPath });
+        Logger.debug(`${GeneratorFactoryV3._className}::${functionName}`, { classPath });
 
         // Create a new instance of the className and return
         return new (require(path.resolve(classPath)).default)() as IGeneratorV3;

@@ -5,7 +5,7 @@ import { ICharpClass } from "../Models/csharp/CsharpClass";
 import { ICsharpField } from "../Models/csharp/CsharpField";
 import { Logger } from "../Utils/Logger";
 
-let debug = !environment.production ? console.log : () => { };
+// !environment.production ? Logger.toggleDebug() : () => { };
 
 @Logger.log
 export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
@@ -30,7 +30,7 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
     protected fieldsWithSetters = new Set<ICsharpField>();
 
     @Logger.call()
-    generate(): string {
+    public generate(): string {
         let functionName = "generate()";
 
         let {

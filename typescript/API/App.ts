@@ -6,7 +6,7 @@ import { Logger } from "../Utils/Logger";
 import { environment } from "../environment";
 
 // let debug = !environment.production ? console.log : () => { };
-environment.production ? Logger.toggleDebug() : () => { };
+// environment.production ? Logger.toggleDebug() : () => { };
 
 @Logger.log
 export class App {

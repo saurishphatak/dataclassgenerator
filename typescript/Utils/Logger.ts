@@ -113,7 +113,7 @@ export class Logger {
         }
 
         else
-            Logger.message(`${chalk.white('Debug messages are not ON!')} ${chalk.white.body('-> Call toggleDebug() method to enable them.')}`);
+            Logger.message(`${chalk.white('Debug messages are not ON!')} ${chalk.white.bold('-> Call toggleDebug() method to enable them.')}`);
     }
 
     // Toggles showWarning

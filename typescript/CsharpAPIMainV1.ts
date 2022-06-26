@@ -1,14 +1,15 @@
-import fs from "fs";
-import path from "path";
 import { environment } from "./environment";
 import { CaseConverterFactory } from "./Factories/CaseConverterFactory";
+import { CaseConverterFactoryV2 } from "./Factories/CaseConverterFactoryV2";
 import { GeneratorFactoryV3 } from "./Factories/GeneratorFactoryV3";
+import { GeneratorFactoryV4 } from "./Factories/GeneratorFactoryV4";
 import { IAPIMainV1 } from "./Interfaces/IAPIMainV1";
 import { ActionFailure, ActionResult, ActionSuccess } from "./Utils/ActionResult";
 import { ConfigRetriever } from "./Utils/ConfigRetriever";
+import { ConfigRetrieverV2 } from "./Utils/ConfigRetrieverV2";
 import { Logger } from "./Utils/Logger";
 
-let debug = !environment.production ? console.log : () => { };
+// let debug = !environment.production ? console.log : () => { };
 
 @Logger.log
 export class CsharpAPIMainV1 implements IAPIMainV1 {
@@ -28,21 +29,24 @@ export class CsharpAPIMainV1 implements IAPIMainV1 {
         try {
 
             for (const classDescription of this._classDescriptions) {
-                debug(`${this.className}::${functionName}`, [classDescription]);
+                Logger.debug(`${this.className}::${functionName}`, [classDescription]);
                 for (const field of classDescription.fields) {
                     console.log(field);
                 }
 
-                let dataClassGenerator = GeneratorFactoryV3.getInstance(classDescription.language);
+                let dataClassGenerator = GeneratorFactoryV4.getInstance(classDescription.language);
 
                 // Get the case converter and set it in the generator
-                let caseConverter = CaseConverterFactory.getInstance();
+                let caseConverter = CaseConverterFactoryV2.getInstance();
 
                 dataClassGenerator.caseConverter = caseConverter;
                 dataClassGenerator.classDescription = classDescription;
 
                 // Get the file extension
-                let fileExtension = ConfigRetriever.retrieve("fileextensions", classDescription.language);
+                let fileExtension = ConfigRetrieverV2.retrieve("fileextensions", classDescription.language).result;
+
+                Logger.debug(`${this.className}::${functionName}`, { fileExtension });
+                // console.log("FILE EXTENSIONS", fileExtension);
 
                 let generatedClassCode = await dataClassGenerator.generate();
 
