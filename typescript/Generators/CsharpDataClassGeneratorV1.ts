@@ -11,9 +11,10 @@ import { Logger } from "../Utils/Logger";
 export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
     protected className = "CsharpDataClassGeneratorV1";
 
-    protected T1 = "\t";
-    protected T2 = "\t\t";
-    protected T3 = "\t\t\t";
+    protected tabOffset = ``;
+    protected T1 = `\t`;
+    protected T2 = `\t\t`;
+    protected T3 = `\t\t\t`;
     protected N1 = "\n";
 
     protected _classDescription!: ICharpClass;
@@ -27,7 +28,7 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
         this._caseConverter = converter;
     }
 
-    protected fieldsWithSetters = new Set<ICsharpField>();
+    protected fieldsWithSettersOrInit = new Set<ICsharpField>();
 
     @Logger.call()
     public generate(): string {
@@ -46,11 +47,16 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
         // Add class namespace if any
         if (namespace.trim().length > 0) {
             classCode += `namespace ${namespace}${this.N1}{${this.N1}`;
+
+            this.tabOffset = `\t`;
+            this.T1 = `${this.tabOffset}${this.T1}`;
+            this.T2 = `${this.tabOffset}${this.T2}`;
+            this.T3 = `${this.tabOffset}${this.T3}`;
         }
 
         // Add class comment if any
         if (comment.trim().length > 0) {
-            classCode += `// ${comment.trim()}${this.N1}`;
+            classCode += `${this.tabOffset}// ${comment.trim()}${this.N1}`;
         }
 
         // Add class attributes
@@ -65,8 +71,8 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
 
         // Add the class name
         // All classes will be abstract
-        classCode += `public abstract class ${name.trim()}Abstract${this.N1}`;
-        classCode += `{${this.N1}`;
+        classCode += `${this.tabOffset}public abstract class ${name.trim()}Abstract${this.N1}`;
+        classCode += `${this.tabOffset}{${this.N1}`;
 
         // Add all the fields
         let fieldsCode = ``;
@@ -114,7 +120,7 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
                 fieldCode += ` = ${defaultValue}`;
             }
 
-            fieldCode += `;${this.N1}`;
+            fieldCode += `;${this.N1 + this.N1}`;
 
             // Generate property if needed
             let propertyCode = this.generatePropertyCode(field);
@@ -132,7 +138,7 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
         classCode += this.generateParameterisedConstructor();
 
         // End the classcode with brace
-        classCode += `}${this.N1}`;
+        classCode += `${this.tabOffset}}${this.N1}`;
 
         // Close the namespace
         if (namespace.length > 0) {
@@ -225,7 +231,7 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
                 getterCode += ` => ${fieldName}`;
             }
 
-            getterCode += `;${this.N1}`;
+            getterCode += `;${this.N1 + this.N1}`;
         }
 
         let setterCode = ``;
@@ -246,10 +252,10 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
                 setterCode += ` => ${fieldName} = value`;
             }
 
-            // Add the field to fields with setter lists
-            this.fieldsWithSetters.add(field);
+            // Add the field to fields with setter list
+            this.fieldsWithSettersOrInit.add(field);
 
-            setterCode += `;${this.N1}`;
+            setterCode += `;${this.N1 + this.N1}`;
         }
 
         let initializerCode = ``;
@@ -261,16 +267,19 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
             for (const attribute of initializerAttributesList) {
                 if (attribute?.trim()?.length > 0)
                     attributesCode += `${this.T2}[${attribute}]${this.N1}`;
-
-                initializerCode += attributesCode;
-                initializerCode += `${this.T2}init`;
-
-                if (propertyType == 'virtual') {
-                    initializerCode += ` => ${fieldName} = value`;
-                }
-
-                initializerCode += `;${this.N1}`;
             }
+
+            initializerCode += attributesCode;
+            initializerCode += `${this.T2}init`;
+
+            if (propertyType == 'virtual') {
+                initializerCode += ` => ${fieldName} = value`;
+            }
+
+            // Add the field to fields with init list
+            this.fieldsWithSettersOrInit.add(field);
+
+            initializerCode += `;${this.N1 + this.N1}`;
         }
 
         return getterCode + setterCode + initializerCode;
@@ -282,25 +291,36 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
         let { name, fields } = this._classDescription;
         name = name.trim();
 
-        let constructorCode = `${this.T1}public ${name}(${this.N1}`;
+        let isconstructorParamPresent = fields.some(f => f.isConstructorParam === true);
+
+        let constructorCode = `${this.T1}public ${name}Abstract(${isconstructorParamPresent ? `${this.N1} ` : ``}`;
 
         // Add the fields to the list of parameters in the constructor
         // only if they are to be initialized in the constructor
         for (const field of fields) {
-            if (field.isConstructorParam)
-                constructorCode += `${this.T2}${field.dataType?.trim()} ${field.name?.trim()},${this.N1}`
+            if (field.isConstructorParam) {
+                constructorCode += `${this.T2}${field.dataType?.trim()} ${field.name?.trim()},${this.N1}`;
+            }
         }
 
-        // Remove the last comma
-        constructorCode = constructorCode.substring(0, constructorCode.length - 2);
+        // Remove the last comma only if there were any parameters passed
+        // to the constructor
+        if (isconstructorParamPresent) {
+            constructorCode = constructorCode.substring(0, constructorCode.length - 2);
+        }
 
+        // Close the parantheses on the next line only if there 
+        // are parameters passed to the constructor
+        if (isconstructorParamPresent) {
+            constructorCode += `${this.N1}${this.T1}`;
+        }
         // Close the constructor param list
-        constructorCode += `${this.N1 + this.T1})${this.N1}${this.T1}{${this.N1}`;
+        constructorCode += `)${this.N1}${this.T1}{${this.N1}`;
 
         // Add the constructor body
         // Setters of fields will be used to assign values to the field
         // else the field will be initialized directly
-        for (const field of this.fieldsWithSetters) {
+        for (const field of this.fieldsWithSettersOrInit) {
 
             // If the field is to be initialized in the constructor
             if (field.isConstructorParam)
@@ -312,7 +332,7 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
         for (const field of fields) {
             let fieldName = `${field.accessModifier == "public" ? field.name?.trim() : "_" + field.name?.trim()}`;
 
-            if (field.isConstructorParam && !this.fieldsWithSetters.has(field)) {
+            if (field.isConstructorParam && !this.fieldsWithSettersOrInit.has(field)) {
                 Logger.debug(`${this.className}::${functionName} DIRECTLY INITIALIZE FIELD : `, field);
                 constructorCode += `${this.T2}this.${fieldName} = ${field.name?.trim()};${this.N1}`;
             }
@@ -320,7 +340,7 @@ export default class CsharpDataClassGeneratorV1 implements IGeneratorV3 {
         }
 
         // Close the constructor body
-        constructorCode += `${this.N1 + this.T1}}${this.N1}`;
+        constructorCode += `${this.T1}}${this.N1}`;
 
         return constructorCode;
     }
